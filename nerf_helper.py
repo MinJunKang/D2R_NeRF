@@ -163,11 +163,23 @@ class PositionalEncoder(nn.Module):
     def forward(self,x):
         return torch.concat([fn(x) for fn in self.embed_fns], dim=-1)
     
-def get_rays(height,width,focal_length,c2w):
+def get_rays(height,width,focal_length_x, focal_length_y,c2w):
     # Apply pinhole camera model to gather directions at each pixel
     i, j = torch.meshgrid(torch.arange(width, dtype=torch.float32).to(c2w),torch.arange(height, dtype=torch.float32).to(c2w),indexing='ij')
     i, j = i.transpose(-1, -2), j.transpose(-1, -2)
-    directions = torch.stack([(i - width * .5) / focal_length,-(j - height * .5) / focal_length,-torch.ones_like(i)], dim=-1)
+    directions = torch.stack([(i - width * .5) / focal_length_x,-(j - height * .5) / focal_length_y,-torch.ones_like(i)], dim=-1)
+
+    # Apply camera pose to directions
+    rays_d = torch.sum(directions[..., None, :] * c2w[:3, :3], dim=-1)
+    # Origin is same for all directions (the optical center)
+    rays_o = c2w[:3, -1].expand(rays_d.shape)
+    return rays_o, rays_d
+
+def get_rays_(height,width,focal,c2w):
+    # Apply pinhole camera model to gather directions at each pixel
+    i, j = torch.meshgrid(torch.arange(width, dtype=torch.float32).to(c2w),torch.arange(height, dtype=torch.float32).to(c2w),indexing='ij')
+    i, j = i.transpose(-1, -2), j.transpose(-1, -2)
+    directions = torch.stack([(i - width * .5) / focal,-(j - height * .5) / focal,-torch.ones_like(i)], dim=-1)
 
     # Apply camera pose to directions
     rays_d = torch.sum(directions[..., None, :] * c2w[:3, :3], dim=-1)
