@@ -1,7 +1,7 @@
 # d2r_nerf_test
 nia_가공데이터_테스트를 위한 레포지토리입니다. 
 
-- 01/27 Update - Origin [Page](https://github.com/summeryoo/d2r_nerf_test)
+- 01/27 Update - [Original Page](https://github.com/summeryoo/d2r_nerf_test)
 
 x_focalLength_inPixels y_focalLength_inPixels를 사용하겠다고 하였지만
 width의 여백이 너무 많아 비효율적이여서 height와 동일하게끔 width를 height 크기만큼 
